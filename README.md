@@ -37,7 +37,8 @@ Components:
 
 The model jointly estimates:
 
-<img width="621" height="106" alt="image" src="https://github.com/user-attachments/assets/400b1092-ef3e-45b0-b669-e9df9bd09bd0" />
+<img width="634" height="141" alt="image" src="https://github.com/user-attachments/assets/11501dfd-b277-4008-b570-6a169e0fd06b" />
+
 
 and uses Viterbi Algorithm for decoding — a dynamic programming approach to find the most probable tag sequence for a given sentence.
 
