@@ -41,24 +41,8 @@ The model jointly estimates:
 
 and uses Viterbi Algorithm for decoding — a dynamic programming approach to find the most probable tag sequence for a given sentence.
 
-🧮 Workflow Overview
-INPUT TEXT
-    ↓
-TEXT TOKENIZATION
-    ↓
-PART-OF-SPEECH TAGGING
-    ↓
-LINGUISTIC FEATURE EXTRACTION
-    ↓
-NAMED ENTITY RELATION MODEL (HMM)
-    ↓
-SEQUENCE LABELING (Viterbi Algorithm)
-    ↓
-CONTEXTUAL UNDERSTANDING
-    ↓
-POST-PROCESSING
-    ↓
-OUTPUT TAGGED ENTITIES
+<img width="1752" height="988" alt="image" src="https://github.com/user-attachments/assets/200dfaef-5912-48f9-b4e5-555dc5c865e5" />
+
 
 ⚙️ Implementation Details
 
@@ -75,36 +59,45 @@ Preprocessing:
 - Removed non-Devanagari tokens
 - Normalized tags (B-PER → PER)
 - Replaced rare words with <UNK>
-Added suffix-based heuristic rules (e.g., -पुर, -नगर, -वाला)
+- Added suffix-based heuristic rules (e.g., -पुर, -नगर, -वाला)
 
 💡 Key Implementation Features
 1. Data Cleaning & Normalization
 Removes noise and ensures only valid Hindi tokens are retained:
-
+```
 def clean_token(token):
     token = re.sub(r'[^\u0900-\u097F]', '', token)
     return token.strip()
+```
 
 2. Laplace Smoothing
 Ensures non-zero probability for unseen transitions and emissions:
 
+```
 P(word | tag) = (count(tag, word) + α) / (count(tag) + α * |V|)
+```
 
 3. Suffix-Based Hebbian Backoff
 Heuristic probabilities based on morphological endings:
 
+```
 if word.endswith("पुर") or word.endswith("नगर"):
     prob = 0.8  # high chance of LOC
+```
 
 4. Viterbi Decoding
 Dynamic programming to find best tag path:
 
+```
 delta[t][curr_tag] = max(delta[t-1][prev] + log(A[prev][curr_tag]) + log(B[curr_tag][word]))
+```
 
 5. Evaluation
+```
 Precision = TP / (TP + FP)
 Recall = TP / (TP + FN)
 F1 = 2 * (Precision * Recall) / (Precision + Recall)
+```
 
 🧠 Example Output
 
