@@ -20,19 +20,12 @@ Named Entity Recognition (NER) is a subtask of Natural Language Processing (NLP)
 NER is foundational for applications like information extraction, question answering, summarization, and knowledge graph building.
 
 🔍 Why Hindi and Indian Languages?
-
-NER in Indian languages poses unique challenges:
-
-No capitalization cues (unlike English)
-
-Rich morphology and inflections
-
-Code-mixing with English
-
-Multi-script variations and transliteration
-
-Sparse annotated corpora
-
+- NER in Indian languages poses unique challenges:
+- No capitalization cues (unlike English)
+- Rich morphology and inflections
+- Code-mixing with English
+- Multi-script variations and transliteration
+- Sparse annotated corpora
 Hence, this project explores how traditional probabilistic models (HMM) can be adapted for morphologically rich, low-resource languages like Hindi.
 
 🧩 Model Overview: Hidden Markov Model (HMM)
