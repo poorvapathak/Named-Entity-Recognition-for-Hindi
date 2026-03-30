@@ -1,10 +1,26 @@
 # Named Entity Recognition (NER) for Hindi using Hidden Markov Model (HMM)
 
-## A Core NLP Approach for Indian Language NER
+> A Core NLP Approach for Indian Language NER
 
-This project implements **Named Entity Recognition (NER) for Hindi using a Hidden Markov Model (HMM)** — a classic probabilistic sequence labeling algorithm.
+This project implements **Named Entity Recognition (NER) for Hindi** using a **Hidden Markov Model (HMM)** — a classic probabilistic sequence labeling algorithm.
 
 Instead of relying on deep neural networks like BERT or transformers, this work focuses on the **core statistical and algorithmic foundation of NER**. It demonstrates how **dynamic programming and linguistic feature engineering** can be used to extract entities from Indian text in an **interpretable and explainable way**.
+
+---
+
+## Table of Contents
+
+- [What is NER?](#what-is-named-entity-recognition-ner)
+- [Why Hindi?](#why-hindi-and-indian-languages)
+- [Model Overview](#model-overview-hidden-markov-model-hmm)
+- [Implementation Details](#implementation-details)
+- [Key Features](#key-implementation-features)
+- [Example Output](#example-output)
+- [Results](#results)
+- [Observations and Insights](#observations-and-insights)
+- [Challenges](#challenges-in-indian-language-ner)
+- [What We Learnt](#what-we-learnt)
+- [Future Work](#possible-future-work)
 
 ---
 
@@ -12,10 +28,12 @@ Instead of relying on deep neural networks like BERT or transformers, this work 
 
 Named Entity Recognition (NER) is a subtask of **Natural Language Processing (NLP)** that identifies and classifies real-world entities in text into predefined categories such as:
 
-- **PER** – Person names (e.g., नरेंद्र मोदी)  
-- **ORG** – Organizations (e.g., भारतीय अंतरिक्ष अनुसंधान संगठन)  
-- **LOC** – Locations (e.g., दिल्ली, वाराणसी)  
-- **DATE / EVENT** – Temporal or event expressions (e.g., २६ जनवरी, गणतंत्र दिवस)
+| Tag | Category | Example |
+|-----|----------|---------|
+| `PER` | Person names | नरेंद्र मोदी |
+| `ORG` | Organizations | भारतीय अंतरिक्ष अनुसंधान संगठन |
+| `LOC` | Locations | दिल्ली, वाराणसी |
+| `DATE/EVENT` | Temporal or event expressions | २६ जनवरी, गणतंत्र दिवस |
 
 NER is foundational for applications like **information extraction, question answering, summarization, and knowledge graph building**.
 
@@ -25,11 +43,11 @@ NER is foundational for applications like **information extraction, question ans
 
 NER in Indian languages poses unique challenges:
 
-- No capitalization cues (unlike English)  
-- Rich morphology and inflections  
-- Code-mixing with English  
-- Multi-script variations and transliteration  
-- Sparse annotated corpora  
+- No capitalization cues (unlike English)
+- Rich morphology and inflections
+- Code-mixing with English
+- Multi-script variations and transliteration
+- Sparse annotated corpora
 
 This project explores how **traditional probabilistic models (HMM)** can be adapted for **morphologically rich, low-resource languages like Hindi**.
 
@@ -41,13 +59,15 @@ The Hidden Markov Model treats the text as a sequence of **observed words** gene
 
 ### Components
 
-- **Hidden States (Y):** Named entity tags (PER, LOC, ORG, O)  
-- **Observations (X):** Words/tokens in the input sentence  
-- **Initial Probabilities (π):** Probability of starting with each tag  
-- **Transition Probabilities (A):** Probability of one tag following another  
-- **Emission Probabilities (B):** Probability of observing a word given a tag  
+| Component | Description |
+|-----------|-------------|
+| **Hidden States (Y)** | Named entity tags: `PER`, `LOC`, `ORG`, `O` |
+| **Observations (X)** | Words/tokens in the input sentence |
+| **Initial Probabilities (pi)** | Probability of starting with each tag |
+| **Transition Probabilities (A)** | Probability of one tag following another |
+| **Emission Probabilities (B)** | Probability of observing a word given a tag |
 
-The model uses the **Viterbi Algorithm** for decoding — a dynamic programming approach to find the most probable tag sequence for a given sentence.
+The model uses the **Viterbi Algorithm** for decoding, a dynamic programming approach to find the most probable tag sequence for a given sentence.
 
 ---
 
@@ -55,29 +75,140 @@ The model uses the **Viterbi Algorithm** for decoding — a dynamic programming 
 
 ### Environment
 
-- **Language:** Python  
-- **Libraries:** math, collections, re, random  
-- **Platform:** Google Colab / Jupyter Notebook  
+- **Language:** Python
+- **Libraries:** `math`, `collections`, `re`, `random`
+- **Platform:** Google Colab / Jupyter Notebook
 
 ### Dataset
 
-- **Source:** WikiANN Hindi  
-- **Format:** JSON lines with tokens and corresponding NER tags  
+- **Source:** WikiANN Hindi
+- **Format:** JSON lines with tokens and corresponding NER tags
 
 ### Preprocessing
 
-- Removed non-Devanagari tokens  
-- Normalized tags (B-PER → PER)  
-- Replaced rare words with `<UNK>`  
-- Added suffix-based heuristic rules (e.g., -पुर, -नगर, -वाला)  
+- Removed non-Devanagari tokens
+- Normalized tags (`B-PER` to `PER`)
+- Replaced rare words with `<UNK>`
+- Added suffix-based heuristic rules (e.g., `-पुर`, `-नगर`, `-वाला`)
 
 ---
 
 ## Key Implementation Features
 
-### 1. Data Cleaning & Normalization
+### 1. Data Cleaning and Normalization
 
 ```python
 def clean_token(token):
     token = re.sub(r'[^\u0900-\u097F]', '', token)
     return token.strip()
+```
+
+### 2. Laplace Smoothing
+
+```
+P(word | tag) = (count(tag, word) + alpha) / (count(tag) + alpha * |V|)
+```
+
+### 3. Suffix-Based Heuristic Backoff
+
+```python
+if word.endswith("पुर") or word.endswith("नगर"):
+    prob = 0.8  # high chance of LOC
+```
+
+### 4. Viterbi Decoding
+
+```python
+delta[t][curr_tag] = max(
+    delta[t-1][prev] + log(A[prev][curr_tag]) + log(B[curr_tag][word])
+)
+```
+
+### 5. Evaluation Metrics
+
+```
+Precision = TP / (TP + FP)
+Recall    = TP / (TP + FN)
+F1        = 2 * (Precision * Recall) / (Precision + Recall)
+```
+
+---
+
+## Example Output
+
+**Input:** `श्री नरेंद्र मोदी दिल्ली गए।`
+
+```
+Predicted Tags: [O, PER, PER, LOC, O, O]
+```
+
+**Input:** `टाटा कंसल्टेंसी सर्विसेज़ भारत की सबसे बड़ी कंपनी है।`
+
+```
+Predicted Tags: [ORG, ORG, ORG, LOC, O, O, O, O, O, O]
+```
+
+**Visualization - Compound LOC entity:**
+
+```
+Sentence  : वाराणसी  उत्तर  प्रदेश  में  एक  प्राचीन  शहर  है  ।
+Gold      :  LOC      LOC    LOC     O    O      O       O    O   O
+Predicted :  LOC      LOC    LOC     O    O      O       O    O   O
+```
+
+Correct identification of compound location entity.
+
+---
+
+## Results
+
+| Metric | Score |
+|--------|-------|
+| Precision | 0.318 |
+| Recall | 0.301 |
+| F1-score | 0.309 |
+
+These results are notable given that this is a **pure HMM implementation** with no ML libraries, no deep models or pretrained embeddings, operating on morphologically rich and noisy Hindi text.
+
+---
+
+## Observations and Insights
+
+- `PER` and `LOC` entities are recognized reliably using honorifics and suffixes
+- `ORG` entities are sometimes misclassified due to overlapping tokens
+- Suffix-based rules improved recall for `LOC` tags
+- Model struggles with multi-word entities and code-mixed text
+
+---
+
+## Challenges in Indian Language NER
+
+- No capitalization features available
+- Agglutinative morphology
+- Compound and multi-token entities
+- Mixed scripts (Latin + Devanagari)
+- Sparse training data
+
+---
+
+## What We Learnt
+
+- HMM is a foundational probabilistic sequence model
+- Viterbi algorithm is key for sequence optimization
+- Linguistic features significantly improve classical model performance
+- Traditional models can still be effective with proper feature engineering
+- Interpretability is a strong advantage of classical NLP models
+
+---
+
+## Possible Future Work
+
+- [ ] Extend to Bi-gram / Trigram HMMs
+- [ ] Transition to Conditional Random Fields (CRF)
+- [ ] Add gazetteer-based features
+- [ ] Explore Semi-Markov CRF for multi-token entities
+- [ ] Apply the approach to other Indian languages
+
+---
+
+*Built with Python · WikiANN Hindi Dataset · HMM + Viterbi Decoding*
